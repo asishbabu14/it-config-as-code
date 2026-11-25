@@ -1,0 +1,123 @@
+name: Drift plan
+
+on:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-secrets:
+    name: Check tenant secrets
+    runs-on: ubuntu-latest
+    outputs:
+      okta: ${{ steps.check.outputs.okta }}
+      entra: ${{ steps.check.outputs.entra }}
+    steps:
+      - id: check
+        env:
+          OKTA_API_TOKEN: ${{ secrets.OKTA_API_TOKEN }}
+          OKTA_ORG_NAME: ${{ secrets.OKTA_ORG_NAME }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        run: |
+          set -euo pipefail
+          okta=false
+          entra=false
+          if [ -n "${OKTA_API_TOKEN}" ] && [ -n "${OKTA_ORG_NAME}" ]; then
+            okta=true
+          fi
+          if [ -n "${ARM_CLIENT_ID}" ] && [ -n "${ARM_CLIENT_SECRET}" ] && [ -n "${ARM_TENANT_ID}" ]; then
+            entra=true
+          fi
+          echo "okta=${okta}" >> "${GITHUB_OUTPUT}"
+          echo "entra=${entra}" >> "${GITHUB_OUTPUT}"
+          echo "Okta drift plan will run: ${okta}"
+          echo "Entra drift plan will run: ${entra}"
+
+  plan-okta:
+    name: Okta drift plan
+    needs: check-secrets
+    if: needs.check-secrets.outputs.okta == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/okta/environments/lab
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.2"
+          terraform_wrapper: false
+      - name: Plan
+        env:
+          TF_IN_AUTOMATION: "1"
+          TF_VAR_okta_api_token: ${{ secrets.OKTA_API_TOKEN }}
+          OKTA_ORG_NAME: ${{ secrets.OKTA_ORG_NAME }}
+          OKTA_BASE_URL: ${{ secrets.OKTA_BASE_URL }}
+        run: |
+          set -euo pipefail
+          terraform init -input=false
+          args=(-var-file=terraform.tfvars.example -var "okta_org_name=${OKTA_ORG_NAME}")
+          if [ -n "${OKTA_BASE_URL}" ]; then
+            args+=(-var "okta_base_url=${OKTA_BASE_URL}")
+          fi
+          set +e
+          set -o pipefail
+          terraform plan -input=false -no-color -detailed-exitcode "${args[@]}" | tee plan.txt
+          code=$?
+          set -e
+          echo "terraform plan exit code: ${code}"
+          cat plan.txt
+          exit "${code}"
+
+  plan-entra:
+    name: Entra drift plan
+    needs: check-secrets
+    if: needs.check-secrets.outputs.entra == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/entra/environments/lab
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.2"
+          terraform_wrapper: false
+      - name: Plan
+        env:
+          TF_IN_AUTOMATION: "1"
+          TF_VAR_client_secret: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        run: |
+          set -euo pipefail
+          terraform init -input=false
+          set +e
+          set -o pipefail
+          terraform plan -input=false -no-color -detailed-exitcode \
+            -var-file=terraform.tfvars.example \
+            -var "tenant_id=${ARM_TENANT_ID}" \
+            -var "client_id=${ARM_CLIENT_ID}" | tee plan.txt
+          code=$?
+          set -e
+          echo "terraform plan exit code: ${code}"
+          cat plan.txt
+          exit "${code}"
+
+  skipped:
+    name: Secrets not configured
+    needs: check-secrets
+    if: needs.check-secrets.outputs.okta != 'true' && needs.check-secrets.outputs.entra != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain the skip
+        run: echo "Tenant secrets are not configured. Terraform drift plan skipped. The offline checker runs in pull request tests."

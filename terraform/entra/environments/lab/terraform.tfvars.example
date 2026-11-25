@@ -1,0 +1,39 @@
+# Copy to terraform.tfvars (gitignored) and replace the ids.
+# Set the client secret in the environment, not in this file:
+#   export TF_VAR_client_secret="..."
+#
+# The placeholder ids below are the nil UUID. They let the file parse.
+# A real plan overrides them.
+
+tenant_id = "00000000-0000-0000-0000-000000000000"
+client_id = "00000000-0000-0000-0000-000000000000"
+
+groups = {
+  admins = {
+    display_name = "lab-admins"
+    description  = "Lab directory administrators"
+  }
+  engineers = {
+    display_name = "lab-engineers"
+    description  = "People who build and test lab workloads"
+  }
+  readers = {
+    display_name = "lab-readers"
+    description  = "Read access to lab apps"
+  }
+}
+
+conditional_access = {
+  display_name = "lab-admins-mfa-report-only"
+  included_group_keys = [
+    "admins",
+  ]
+}
+
+app = {
+  display_name = "lab-portal"
+  homepage_url = "https://lab.example.test"
+  redirect_uris = [
+    "https://lab.example.test/auth/callback",
+  ]
+}

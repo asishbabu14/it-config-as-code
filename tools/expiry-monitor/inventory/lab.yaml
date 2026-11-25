@@ -1,0 +1,31 @@
+# Lab inventory for the expiry monitor.
+#
+# Dates are far enough ahead of late 2026 that the scheduled workflow, which
+# uses the real clock, stays quiet. `make demo` freezes the clock at
+# 2028-04-01 so the same file shows notice, warning, critical, and expired.
+#
+# Regenerate the PEM files with tools/expiry-monitor/generate_fixtures.py
+# if you change a certificate date. Apple Push and domain dates live only here.
+certificates:
+  - name: lab-portal-saml
+    kind: saml_signing
+    pem: ../fixtures/certs/saml-signing.pem
+  - name: lab-portal-metadata
+    kind: saml_signing
+    metadata: ../fixtures/certs/idp-metadata.xml
+  - name: lab-portal-ssl
+    kind: ssl
+    pem: ../fixtures/certs/ssl-lab.pem
+    host: lab.example.test
+    live_check: false
+  - name: lab-mdm-apple-push
+    kind: apple_push
+    not_after: "2028-04-06T00:00:00Z"
+  - name: lab-wifi-dot1x
+    kind: wifi
+    pem: ../fixtures/certs/wifi-dot1x.pem
+domains:
+  - name: lab.example.test
+    expires_on: "2029-01-15"
+  - name: files.lab.example.test
+    expires_on: "2028-04-20"

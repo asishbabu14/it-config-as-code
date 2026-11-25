@@ -1,0 +1,59 @@
+# Copy to terraform.tfvars (gitignored) and replace the org name.
+# Set the API token in the environment, not in this file:
+#   export TF_VAR_okta_api_token="..."
+
+okta_org_name = "your-okta-subdomain"
+okta_base_url = "okta.com"
+
+groups = {
+  engineers = {
+    name        = "lab-engineers"
+    description = "People who build and test lab workloads"
+  }
+  readers = {
+    name        = "lab-readers"
+    description = "Read access to lab apps"
+  }
+  admins = {
+    name        = "lab-admins"
+    description = "Lab directory administrators"
+  }
+}
+
+group_rules = {
+  engineers = {
+    name       = "engineers-by-department"
+    group_key  = "engineers"
+    expression = "String.stringContains(user.department, \"Engineering\")"
+    status     = "ACTIVE"
+  }
+  readers = {
+    name       = "readers-by-department"
+    group_key  = "readers"
+    expression = "String.stringContains(user.department, \"Research\")"
+    status     = "ACTIVE"
+  }
+}
+
+signon_policy = {
+  name        = "lab-portal-signon"
+  description = "Password plus another factor for the lab portal. Everyone else is denied."
+  rule_name   = "password-and-another-factor"
+  included_group_keys = [
+    "engineers",
+    "readers",
+  ]
+}
+
+saml_app = {
+  label       = "lab-portal"
+  sso_url     = "https://lab.example.test/sso/saml"
+  recipient   = "https://lab.example.test/sso/saml"
+  destination = "https://lab.example.test/sso/saml"
+  audience    = "https://lab.example.test/saml"
+  status      = "ACTIVE"
+  assigned_group_keys = [
+    "engineers",
+    "readers",
+  ]
+}
