@@ -1,0 +1,36 @@
+# Lab desired state for the offline drift checker.
+# This file is the source the checker compares to samples/live-export.json.
+version: 1
+groups:
+  - name: lab-engineers
+    description: People who build and test lab workloads
+  - name: lab-readers
+    description: Read access to lab apps
+  - name: lab-admins
+    description: Lab directory administrators
+  - name: lab-contractors
+    description: Time boxed lab access
+rules:
+  - name: engineers-by-department
+    group: lab-engineers
+    expression: 'String.stringContains(user.department, "Engineering")'
+    status: ACTIVE
+  - name: readers-by-department
+    group: lab-readers
+    expression: 'String.stringContains(user.department, "Research")'
+    status: ACTIVE
+apps:
+  - name: lab-portal
+    sign_on: saml
+    status: ACTIVE
+    audience: https://lab.example.test/saml
+    assignments:
+      - lab-engineers
+      - lab-readers
+policies:
+  - name: mfa-lab-admins
+    state: enabledForReportingButNotEnforced
+    grant:
+      - mfa
+    include_groups:
+      - lab-admins

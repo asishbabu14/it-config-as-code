@@ -1,0 +1,11 @@
+{
+  "groups": {
+    "lab-engineers": [
+      "ada@lab.example.test",
+      "bea@lab.example.test"
+    ],
+    "lab-readers": [
+      "cy@lab.example.test"
+    ]
+  }
+}

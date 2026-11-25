@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "source": "mock",
+  "exported_at": "2026-11-24T02:00:00Z",
+  "note": "Deliberate drift for the offline checker. This file is not a tenant export.",
+  "groups": [
+    {
+      "profile": {
+        "name": "lab-engineers",
+        "description": "People who build and test lab workloads"
+      }
+    },
+    {
+      "profile": {
+        "name": "lab-readers",
+        "description": "Stale reader description"
+      }
+    },
+    {
+      "profile": {
+        "name": "lab-admins",
+        "description": "Lab directory administrators"
+      }
+    },
+    {
+      "profile": {
+        "name": "lab-legacy",
+        "description": "Retired lab group still present in the mock export"
+      }
+    }
+  ],
+  "groupRules": [
+    {
+      "name": "engineers-by-department",
+      "status": "INACTIVE",
+      "groupAssignments": ["lab-engineers"],
+      "conditions": {
+        "expression": {
+          "value": "String.stringContains(user.department, \"Engineering\")"
+        }
+      }
+    },
+    {
+      "name": "readers-by-department",
+      "status": "ACTIVE",
+      "groupAssignments": ["lab-readers"],
+      "conditions": {
+        "expression": {
+          "value": "String.stringContains(user.department, \"Research\")"
+        }
+      }
+    }
+  ],
+  "applications": [
+    {
+      "label": "lab-portal",
+      "signOnMode": "SAML_2_0",
+      "status": "ACTIVE",
+      "settings": {
+        "signOn": {
+          "audience": "https://lab.example.test/saml"
+        }
+      },
+      "assignedGroups": ["lab-readers", "lab-legacy"]
+    }
+  ],
+  "conditionalAccessPolicies": [
+    {
+      "displayName": "mfa-lab-admins",
+      "state": "disabled",
+      "grantControls": {
+        "builtInControls": ["mfa"]
+      },
+      "conditions": {
+        "users": {
+          "includeGroups": ["lab-admins"]
+        }
+      }
+    }
+  ]
+}

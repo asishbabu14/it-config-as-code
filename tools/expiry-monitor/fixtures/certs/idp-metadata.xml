@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://lab.example.test/saml">
+  <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <KeyDescriptor use="signing">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>MIIC1DCCAbygAwIBAgIUUWTXyhfeWczThv3ddi7FzYSEOT4wDQYJKoZIhvcNAQELBQAwJDEiMCAG
+A1UEAwwZbWV0YWRhdGEubGFiLmV4YW1wbGUudGVzdDAeFw0yNjAxMDEwMDAwMDBaFw0yODA1MjAw
+MDAwMDBaMCQxIjAgBgNVBAMMGW1ldGFkYXRhLmxhYi5leGFtcGxlLnRlc3QwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQCwho6j+KR0AQMZtd6KXVfc/ihN1o7tMjw4Cg/MrfdHQfvPuFcY
+dwaR0w9sx++SDDDS2cnbK6ZzA+GDpXH8lqsrX56PVS+4yRyiaMwqdCXmaEoHmzuRvUoNmiBQGj2M
+VkiIqkj49A7RkFE/Fguh+GwWzBcj8jsKKLmndfPJOpARssZgyBivB+BS3/hajq6+iE82Z0RgaIDk
+Zi0VrvcajTFVBGRY3aOycqdFHgBgXF95cgBhvCkvSbgkQMjS/RHX/pYXcaUO1zbqZMlcQDVposPP
+tZq92tYaLpeA4yICqfxcpF/GI3tvHQ+mcDxq1xjx48xtHpdw5YUFqXiyQLiU07vJAgMBAAEwDQYJ
+KoZIhvcNAQELBQADggEBAKa53Z5lRTXbctGVMuobeo98lxLskvGp+IEn+MeKa4uS2lrBYI8bLr2r
+KzGdZGpd4zq3nskCaqxfRBxd6Mx/cUt8p8TyvLkdgMm9ldGJmHIJYhgph5vKOgqgg+/2fUnmBO3q
+DFclhaSShoQKtP9YGJ27TcsuydPLEL4CrkWU+ZbE9X2liixPBNeUTlyP/swBr4L68iC/kJ1do8et
+xtonRdkaTecp2q/mrHtyLchBYnGYN0mBkwNtGXAjNuAk81CJePOaesvwms4vxf0UZAyKXUTbFczZ
+VnTb3TFyIG+rmdKGo05VshTtpSC1MgdwDp/C/yOAW9GFnWbVbA61ib+QrZQ=</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </KeyDescriptor>
+  </SPSSODescriptor>
+</EntityDescriptor>
